@@ -871,7 +871,6 @@ def start_cluster(num_nodes,
                                         boot_node.addr()))
         handle.start()
         handles.append(handle)
-
     for handle in handles:
         handle.join()
 
@@ -923,6 +922,21 @@ def start_bridge(nodes, start_local_ethereum=True, handle_contracts=True, handle
 
     return (bridge, ganache_node)
 
+
+def update_dict_recursive(dst, src):
+    """Recursively update a dictionary.
+
+    This is similar to dst.update(src) expect that for any key in src which is
+    a dictionary in both dst and src the update is performed recursively rather
+    than replacing the entire dictionary.
+    """
+    for key, value in src.items():
+        if isinstance(value, dict) and isinstance(dest.get(key), dict):
+            update_dict_recursive(dst[key], value)
+        else:
+            dest[key] = value
+
+
 DEFAULT_CONFIG = {
     'local': True,
     'preexist': False,
@@ -945,15 +959,18 @@ CONFIG_ENV_VAR = 'NEAR_PYTEST_CONFIG'
 def load_config():
     config = DEFAULT_CONFIG
 
-    config_file = os.environ.get(CONFIG_ENV_VAR, '')
-    if config_file:
-        try:
-            with open(config_file) as f:
-                new_config = json.load(f)
-                config.update(new_config)
-                logger.info(f"Load config from {config_file}, config {config}")
-        except FileNotFoundError:
-            logger.info(f"Failed to load config file, use default config {config}")
-    else:
+    config_file = os.environ.get(CONFIG_ENV_VAR)
+    if not config_file:
         logger.info(f"Use default config {config}")
+        return config
+
+    try:
+        with open(config_file) as rd:
+            new_config = json.load(rd)
+    except FileNotFoundError:
+        logger.info(f"Failed to load config file, use default config {config}")
+        return config
+
+    update_dict_recursive(config, new_config)
+    logger.info(f"Load config from {config_file}, config {config}")
     return config
