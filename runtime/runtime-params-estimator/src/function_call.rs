@@ -3,7 +3,6 @@ use crate::testbed_runners::{end_count, start_count, GasMetric, Consumed};
 use crate::vm_estimator::{create_context, least_squares_method};
 use near_primitives::config::VMConfig;
 use near_primitives::contract::ContractCode;
-use near_primitives::profile::ProfileData;
 use near_primitives::runtime::fees::RuntimeFeesConfig;
 use near_primitives::types::{CompiledContractCache, ProtocolVersion};
 use near_store::{create_store, StoreCompiledContractCache};
@@ -117,7 +116,7 @@ fn test_function_call_time() {
     // cargo test --release --lib function_call::test_function_call_time
     //    --features required  -- --exact --nocapture
     test_function_call(GasMetric::Time, VMKind::Wasmer0);
-    test_function_call(GasMetric::Time, VMKind::Wasmer1);
+    test_function_call(GasMetric::Time, VMKind::Wasmer2);
     test_function_call(GasMetric::Time, VMKind::Wasmtime);
 }
 
@@ -131,7 +130,7 @@ fn test_function_call_icount() {
     // /host/nearcore/runtime/runtime-params-estimator/emu-cost/counter_plugin/qemu-x86_64 \
     // -cpu Westmere-v1 -plugin file=/host/nearcore/runtime/runtime-params-estimator/emu-cost/counter_plugin/libcounter.so $@
     test_function_call(GasMetric::ICount, VMKind::Wasmer0);
-    test_function_call(GasMetric::ICount, VMKind::Wasmer1);
+    test_function_call(GasMetric::ICount, VMKind::Wasmer2);
     test_function_call(GasMetric::ICount, VMKind::Wasmtime);
 }
 
@@ -282,7 +281,6 @@ pub fn compute_function_call_cost(
             vm_kind,
             ProtocolVersion::MAX,
             cache,
-            ProfileData::new(),
         );
         if result.1.is_some() {
             println!("{:?}", result);
@@ -304,7 +302,6 @@ pub fn compute_function_call_cost(
             vm_kind,
             ProtocolVersion::MAX,
             cache,
-            ProfileData::new(),
         );
         assert!(result.1.is_none());
     }

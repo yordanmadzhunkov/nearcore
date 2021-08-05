@@ -129,7 +129,7 @@ fn main() {
     match cli_args.vm_kind.as_deref() {
         Some("wasmtime") => script.vm_kind(VMKind::Wasmtime),
         Some("wasmer") => script.vm_kind(VMKind::Wasmer0),
-        Some("wasmer1") => script.vm_kind(VMKind::Wasmer1),
+        Some("wasmer2") => script.vm_kind(VMKind::Wasmer2),
         _ => (),
     };
     if let Some(config) = &cli_args.config {
@@ -180,7 +180,7 @@ fn main() {
     println!(
         "{}",
         serde_json::to_string(&StandaloneOutput {
-            outcome,
+            outcome: outcome.clone(),
             err,
             receipts: results.state.get_receipt_create_calls().clone(),
             state: State(results.state.fake_trie),
@@ -188,6 +188,11 @@ fn main() {
         .unwrap()
     );
 
-    assert_eq!(all_gas, results.profile.all_gas());
-    println!("{:#?}", results.profile);
+    match &outcome {
+        Some(outcome) => {
+            assert_eq!(all_gas, outcome.profile.all_gas());
+            println!("{:#?}", outcome.profile);
+        }
+        _ => {}
+    }
 }

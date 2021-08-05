@@ -5,7 +5,6 @@ mod rs_contract;
 mod ts_contract;
 
 use near_primitives::contract::ContractCode;
-use near_primitives::profile::ProfileData;
 
 use crate::{run_vm, VMKind};
 use near_primitives::runtime::fees::RuntimeFeesConfig;
@@ -29,8 +28,8 @@ fn with_vm_variants(runner: fn(VMKind) -> ()) {
     #[cfg(feature = "wasmtime_vm")]
     runner(VMKind::Wasmtime);
 
-    #[cfg(feature = "wasmer1_vm")]
-    runner(VMKind::Wasmer1);
+    #[cfg(feature = "wasmer2_vm")]
+    runner(VMKind::Wasmer2);
 }
 
 fn create_context(input: Vec<u8>) -> VMContext {
@@ -80,7 +79,6 @@ fn make_simple_contract_call_with_gas_vm(
         vm_kind,
         LATEST_PROTOCOL_VERSION,
         None,
-        ProfileData::new(),
     )
 }
 
@@ -118,6 +116,5 @@ fn make_cached_contract_call_vm(
         vm_kind,
         LATEST_PROTOCOL_VERSION,
         Some(cache),
-        ProfileData::new(),
     )
 }
