@@ -256,7 +256,6 @@ pub fn compute_function_call_cost(
                 vm_kind,
                 ProtocolVersion::MAX,
                 cache,
-                ProfileData::new(),
             );
             if result.1.is_some() {
                 println!("{:?}", result);
