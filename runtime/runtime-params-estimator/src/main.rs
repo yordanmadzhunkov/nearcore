@@ -2,7 +2,7 @@ use anyhow::Context;
 use clap::Clap;
 use near_vm_runner::VMKind;
 use nearcore::get_default_home;
-use runtime_params_estimator::cases::run;
+use runtime_params_estimator::cases::{run, debug_op_cost};
 use runtime_params_estimator::testbed_runners::Config;
 use runtime_params_estimator::testbed_runners::GasMetric;
 use std::env;
@@ -41,6 +41,7 @@ struct CliArgs {
 }
 
 fn main() -> anyhow::Result<()> {
+    debug_op_cost(String::from("main"));
     let cli_args = CliArgs::parse();
 
     let state_dump_path = cli_args.home.unwrap_or_else(|| get_default_home().into());
@@ -63,6 +64,7 @@ fn main() -> anyhow::Result<()> {
         "wasmtime" => VMKind::Wasmtime,
         other => unreachable!("Unknown vm_kind {}", other),
     };
+    debug_op_cost(String::from("pre-run"));
     let runtime_config = run(
         Config {
             warmup_iters_per_block,

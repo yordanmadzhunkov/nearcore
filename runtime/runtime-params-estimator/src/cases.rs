@@ -1,3 +1,6 @@
+use std::fs::OpenOptions;
+use std::io::prelude::*;
+
 use near_primitives::types::Gas;
 use num_rational::Ratio;
 use rand::{Rng, SeedableRng};
@@ -237,8 +240,24 @@ pub enum Metric {
     cpu_ram_soak_test,
 }
 
+pub fn debug_op_cost(state: String) {
+    let mut file = OpenOptions::new()
+        .write(true)
+        .append(true)
+        .open("/host/tmp/data/profile.txt")
+        .unwrap();
+
+    if let Err(e) = writeln!(file, "REGULAR_OP_COST: {} state: {}", ratio_to_gas(
+        GasMetric::ICount,
+        cost_per_op(GasMetric::ICount, &CODE_1M),
+    ), state) {
+        eprintln!("Couldn't write to file: {}", e);
+    }
+}
+
 #[allow(unused_variables)]
 pub fn run(mut config: Config, only_compile: bool) -> RuntimeConfig {
+    debug_op_cost(String::from("before"));
     let mut m = Measurements::new(config.metric);
     if only_compile {
         let (contract_compile_base_cost, contract_per_byte_cost) =
