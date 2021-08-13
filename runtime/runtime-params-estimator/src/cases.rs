@@ -255,6 +255,14 @@ pub fn debug_op_cost(state: String) {
     }
 }
 
+#[test]
+fn test_cost_per_op() {
+    println!("{}", ratio_to_gas(
+        GasMetric::ICount,
+        cost_per_op(GasMetric::ICount, &CODE_1M),
+    ));
+}
+
 #[allow(unused_variables)]
 pub fn run(mut config: Config, only_compile: bool) -> RuntimeConfig {
     debug_op_cost(String::from("before"));
