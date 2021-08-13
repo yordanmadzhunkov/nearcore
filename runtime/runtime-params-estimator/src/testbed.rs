@@ -4,6 +4,7 @@ use std::path::Path;
 
 use borsh::BorshDeserialize;
 
+use genesis_populate::GenesisBuilder;
 use near_chain_configs::Genesis;
 use near_primitives::receipt::Receipt;
 use near_primitives::runtime::config::RuntimeConfig;
