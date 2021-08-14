@@ -55,8 +55,6 @@ wasmer-compiler-singlepass = { git = "https://github.com/near/wasmer", branch = 
 
 [profile.release]
 overflow-checks = true
-lto = true
-codegen-units = 1 # Use only 1 codegen-unit to enable full optimizations.
 
 [profile.bench]
 lto = true
