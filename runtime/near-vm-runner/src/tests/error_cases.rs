@@ -768,16 +768,10 @@ fn external_indirect_call_contract() -> Vec<u8> {
 #[test]
 fn test_external_call_indirect() {
     with_vm_variants(|vm_kind: VMKind| {
-        match vm_kind {
-            // Upstream bug: https://github.com/wasmerio/wasmer/issues/2329.
-            VMKind::Wasmer2 => return,
-            _ => (),
-        }
-
         let (outcome, err) =
             make_simple_contract_call_vm(&external_indirect_call_contract(), "main", vm_kind);
         assert_eq!(err, None);
-        assert_eq!(outcome, Some(vm_outcome_with_gas(332374437)));
+        assert_eq!(outcome, Some(vm_outcome_with_gas(334541937)));
     });
 }
 
