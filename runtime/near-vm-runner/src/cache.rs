@@ -383,15 +383,15 @@ pub fn precompile_contract(
 }
 
 /// We not use stable hasher as it could change with Rust releases, so rely on stable SIP hash.
+#[allow(deprecated)]
+pub(crate) struct StableHasher(SipHasher);
+
 impl StableHasher {
     #[allow(deprecated)]
     pub fn new() -> StableHasher {
         StableHasher(SipHasher::new())
     }
 }
-
-#[allow(deprecated)]
-pub(crate) struct StableHasher(SipHasher);
 
 impl Hasher for StableHasher {
     fn finish(&self) -> u64 {
