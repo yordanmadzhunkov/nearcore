@@ -157,7 +157,7 @@ fn test_empty_method() {
     });
 }
 
-pub fn trap_contract() -> Vec<u8> {
+fn trap_contract() -> Vec<u8> {
     wat::parse_str(
         r#"
             (module
@@ -208,8 +208,7 @@ fn test_trap_initializer() {
     // See the comment is test_stack_overflow.
     with_vm_variants(|vm_kind: VMKind| {
         match vm_kind {
-            VMKind::Wasmer0 => {}
-            VMKind::Wasmer2 => {}
+            VMKind::Wasmer0 | VMKind::Wasmer2 => {}
             // All contracts leading to hardware traps can not run concurrently on Wasmtime and Wasmer,
             // Check if can restore, once get rid of Wasmer 0.x.
             VMKind::Wasmtime => return,

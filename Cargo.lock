@@ -524,9 +524,9 @@ dependencies = [
 
 [[package]]
 name = "bitflags"
-version = "1.3.1"
+version = "1.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2da1976d75adbe5fbc88130ecd119529cf1cc6a93ae1546d8696ee66f0d21af1"
+checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
 name = "bitvec"
@@ -2224,9 +2224,9 @@ dependencies = [
 
 [[package]]
 name = "insta"
-version = "1.7.1"
+version = "1.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c4a1b21a2971cea49ca4613c0e9fe8225ecaf5de64090fddc6002284726e9244"
+checksum = "58019516c1403ac45b106c9fc4e8fcbd77a78e98b014c619d1506338902ccfa4"
 dependencies = [
  "console",
  "lazy_static",
@@ -2344,9 +2344,9 @@ dependencies = [
 
 [[package]]
 name = "jobserver"
-version = "0.1.23"
+version = "0.1.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f5ca711fd837261e14ec9e674f092cbb931d3fa1482b017ae59328ddc6f3212b"
+checksum = "af25a77299a7f711a01975c35a6a424eb6862092cc2d6c72c4ed6cbc56dfc1fa"
 dependencies = [
  "libc",
 ]
@@ -5730,7 +5730,7 @@ checksum = "2e0c4a743a309662d45f4ede961d7afa4ba4131a59a639f29b0069c3798bbcc2"
 [[package]]
 name = "wasmer"
 version = "2.0.0"
-source = "git+https://github.com/olonho/wasmer?branch=signalless#75cd58795dc62a881e6d4cc925f0dc1a86e7631d"
+source = "git+https://github.com/olonho/wasmer?branch=signalless#4323341bcc4a733e76dae3ec6e12fce615423795"
 dependencies = [
  "cfg-if 1.0.0",
  "indexmap",
@@ -5755,7 +5755,7 @@ dependencies = [
 [[package]]
 name = "wasmer-compiler"
 version = "2.0.0"
-source = "git+https://github.com/olonho/wasmer?branch=signalless#75cd58795dc62a881e6d4cc925f0dc1a86e7631d"
+source = "git+https://github.com/olonho/wasmer?branch=signalless#4323341bcc4a733e76dae3ec6e12fce615423795"
 dependencies = [
  "enumset",
  "loupe",
@@ -5773,7 +5773,7 @@ dependencies = [
 [[package]]
 name = "wasmer-compiler-cranelift"
 version = "2.0.0"
-source = "git+https://github.com/olonho/wasmer?branch=signalless#75cd58795dc62a881e6d4cc925f0dc1a86e7631d"
+source = "git+https://github.com/olonho/wasmer?branch=signalless#4323341bcc4a733e76dae3ec6e12fce615423795"
 dependencies = [
  "cranelift-codegen 0.76.0",
  "cranelift-entity 0.76.0",
@@ -5792,7 +5792,7 @@ dependencies = [
 [[package]]
 name = "wasmer-compiler-singlepass"
 version = "2.0.0"
-source = "git+https://github.com/olonho/wasmer?branch=signalless#75cd58795dc62a881e6d4cc925f0dc1a86e7631d"
+source = "git+https://github.com/olonho/wasmer?branch=signalless#4323341bcc4a733e76dae3ec6e12fce615423795"
 dependencies = [
  "byteorder",
  "dynasm",
@@ -5810,7 +5810,7 @@ dependencies = [
 [[package]]
 name = "wasmer-derive"
 version = "2.0.0"
-source = "git+https://github.com/olonho/wasmer?branch=signalless#75cd58795dc62a881e6d4cc925f0dc1a86e7631d"
+source = "git+https://github.com/olonho/wasmer?branch=signalless#4323341bcc4a733e76dae3ec6e12fce615423795"
 dependencies = [
  "proc-macro-error",
  "proc-macro2",
@@ -5821,7 +5821,7 @@ dependencies = [
 [[package]]
 name = "wasmer-engine"
 version = "2.0.0"
-source = "git+https://github.com/olonho/wasmer?branch=signalless#75cd58795dc62a881e6d4cc925f0dc1a86e7631d"
+source = "git+https://github.com/olonho/wasmer?branch=signalless#4323341bcc4a733e76dae3ec6e12fce615423795"
 dependencies = [
  "backtrace",
  "lazy_static",
@@ -5841,7 +5841,7 @@ dependencies = [
 [[package]]
 name = "wasmer-engine-dylib"
 version = "2.0.0"
-source = "git+https://github.com/olonho/wasmer?branch=signalless#75cd58795dc62a881e6d4cc925f0dc1a86e7631d"
+source = "git+https://github.com/olonho/wasmer?branch=signalless#4323341bcc4a733e76dae3ec6e12fce615423795"
 dependencies = [
  "cfg-if 1.0.0",
  "leb128",
@@ -5862,7 +5862,7 @@ dependencies = [
 [[package]]
 name = "wasmer-engine-universal"
 version = "2.0.0"
-source = "git+https://github.com/olonho/wasmer?branch=signalless#75cd58795dc62a881e6d4cc925f0dc1a86e7631d"
+source = "git+https://github.com/olonho/wasmer?branch=signalless#4323341bcc4a733e76dae3ec6e12fce615423795"
 dependencies = [
  "cfg-if 1.0.0",
  "leb128",
@@ -5879,7 +5879,7 @@ dependencies = [
 [[package]]
 name = "wasmer-object"
 version = "2.0.0"
-source = "git+https://github.com/olonho/wasmer?branch=signalless#75cd58795dc62a881e6d4cc925f0dc1a86e7631d"
+source = "git+https://github.com/olonho/wasmer?branch=signalless#4323341bcc4a733e76dae3ec6e12fce615423795"
 dependencies = [
  "object 0.26.0",
  "thiserror",
@@ -5954,7 +5954,7 @@ dependencies = [
 [[package]]
 name = "wasmer-types"
 version = "2.0.0"
-source = "git+https://github.com/olonho/wasmer?branch=signalless#75cd58795dc62a881e6d4cc925f0dc1a86e7631d"
+source = "git+https://github.com/olonho/wasmer?branch=signalless#4323341bcc4a733e76dae3ec6e12fce615423795"
 dependencies = [
  "indexmap",
  "loupe",
@@ -5966,7 +5966,7 @@ dependencies = [
 [[package]]
 name = "wasmer-vm"
 version = "2.0.0"
-source = "git+https://github.com/olonho/wasmer?branch=signalless#75cd58795dc62a881e6d4cc925f0dc1a86e7631d"
+source = "git+https://github.com/olonho/wasmer?branch=signalless#4323341bcc4a733e76dae3ec6e12fce615423795"
 dependencies = [
  "backtrace",
  "cc",
