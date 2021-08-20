@@ -108,5 +108,20 @@ skip = [
     { name = "arrayvec", version = "=0.5.2" },
 
     # borsh uses a very old version of proc-macro-crate
-    { name = "proc-macro-crate", version = "=0.1.5" }
+    { name = "proc-macro-crate", version = "=0.1.5" },
+
+    # wasmer2
+    { name = "addr2line", version = "=0.14.1" },
+    { name = "bitvec", version = "=0.19.5" },
+    { name = "borsh", version = "=0.8.2" },
+    { name = "borsh-derive", version = "=0.8.2" },
+    { name = "borsh-derive-internal", version = "=0.8.2" },
+    { name = "borsh-schema-derive-internal", version = "=0.8.2" },
+    { name = "generic-array", version = "=0.12.4" },
+    { name = "hashbrown", version = "=0.9.1" },
+    { name = "object", version = "=0.23.0" },
+    { name = "rustc_version", version = "=0.2.3" },
+    { name = "radium", version = "=0.5.3" },
+    { name = "target-lexicon", version = "=0.11.2" },
+    { name = "wasmparser", version = "=0.76.0" },
 ]
