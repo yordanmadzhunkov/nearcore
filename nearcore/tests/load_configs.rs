@@ -32,7 +32,12 @@ fn test_betanet_backwards_compatibility() {
         old_config.account_creation_config.registrar_account_id =
             AccountId::try_from(String::from("registrar")).unwrap();
         let new_config = store.get_config(protocol_version.clone()).as_ref().clone();
-        serde_json::to_file
+
+        let str = serde_json::to_string_pretty(&old_config)
+            .expect("Failed serializing the runtime config");
+        let mut file = File::create("/tmp/old_cfg.json").expect("Failed to create file");
+        file.write_all(str.as_bytes());
+
         assert_eq!(old_config, new_config);
     }
 }
