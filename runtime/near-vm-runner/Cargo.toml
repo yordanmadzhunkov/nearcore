@@ -65,6 +65,11 @@ protocol_feature_alt_bn128 = [
     "near-vm-errors/protocol_feature_alt_bn128"
 ]
 
+protocol_feature_wasm_global_gas_counter = [
+    "near-vm-logic/protocol_feature_wasm_global_gas_counter",
+    "near-primitives/protocol_feature_wasm_global_gas_counter"
+]
+
 [package.metadata.cargo-udeps.ignore]
 # `no_cache` feature leads to an unused `cached` crate
 normal = ["cached"]

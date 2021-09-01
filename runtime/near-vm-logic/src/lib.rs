@@ -10,7 +10,9 @@ pub mod types;
 mod utils;
 
 pub use context::VMContext;
-pub use dependencies::{External, InstanceLike, MemoryLike, ValuePtr};
+#[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
+pub use dependencies::InstanceLike;
+pub use dependencies::{External, MemoryLike, ValuePtr};
 pub use logic::{VMLogic, VMOutcome};
 pub use near_primitives_core::config::*;
 pub use near_primitives_core::profile;

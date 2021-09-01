@@ -47,8 +47,10 @@ macro_rules! wrapped_imports {
                     $(#[cfg(feature = $feature_name)])*
                     pub fn $func( ctx: &mut Ctx, $( $arg_name: $arg_type ),* ) -> VMResult<($( $returns ),*)> {
                         let logic: &mut VMLogic<'_> = unsafe { &mut *(ctx.data as *mut VMLogic<'_>) };
+                        #[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
                         logic.sync_from_wasm_counter()?;
                         let r = logic.$func( $( $arg_name, )* );
+                        #[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
                         logic.sync_to_wasm_counter();
                         r
                     }
@@ -328,7 +330,7 @@ wrapped_imports! {
     storage_iter_next<[iterator_id: u64, key_register_id: u64, value_register_id: u64] -> [u64]>,
     // Function for the injected gas counter. Automatically called by the gas meter.
     gas<[gas_amount: u32] -> []>,
-    out_of_gas_callback<[last_ops: u64] -> []>,
+    #["protocol_feature_wasm_global_gas_counter", WasmGlobalGasCounter] out_of_gas_callback<[last_ops: u64] -> []>,
     // ###############
     // # Validator API #
     // ###############

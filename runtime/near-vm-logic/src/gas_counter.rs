@@ -197,6 +197,7 @@ impl GasCounter {
         self.used_gas
     }
 
+    #[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
     pub fn remaining_prepaid_gas(&self) -> Gas {
         self.prepaid_gas - self.used_gas
     }

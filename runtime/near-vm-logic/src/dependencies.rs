@@ -32,6 +32,7 @@ pub trait MemoryLike {
 }
 
 /// An abstraction over the instance to execute the smart contract
+#[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
 pub trait InstanceLike {
     /// Get wasm remaining ops.
     fn get_remaining_ops(&self) -> u64;

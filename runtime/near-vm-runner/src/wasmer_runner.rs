@@ -6,6 +6,7 @@ use near_primitives::runtime::fees::RuntimeFeesConfig;
 use near_primitives::{config::VMConfig, types::CompiledContractCache, version::ProtocolVersion};
 use near_vm_errors::{CompilationError, FunctionCallError, MethodResolveError, VMError, WasmTrap};
 use near_vm_logic::types::PromiseResult;
+#[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
 use near_vm_logic::InstanceLike;
 use near_vm_logic::{External, VMContext, VMLogic, VMLogicError, VMOutcome};
 use wasmer_runtime::{ImportObject, Module};
@@ -209,8 +210,10 @@ impl IntoVMError for wasmer_runtime::error::RuntimeError {
     }
 }
 
+#[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
 pub struct Wasmer0Instance(pub wasmer_runtime_core::Instance);
 
+#[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
 impl InstanceLike for Wasmer0Instance {
     fn get_remaining_ops(&self) -> u64 {
         let remaining_ops: wasmer_runtime::Global =
@@ -293,6 +296,7 @@ pub fn run_wasmer<'a>(
         );
     }
 
+    #[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
     let gas_mode = if wasm_config.regular_op_cost > 0 {
         GasMode::Paid(logic.remaining_prepaid_gas() / wasm_config.regular_op_cost as u64)
     } else {
@@ -305,10 +309,20 @@ pub fn run_wasmer<'a>(
         return (None, Some(e));
     }
 
-    let err = run_method(&module, &import_object, method_name, gas_mode, &mut logic).err();
+    let err = run_method(
+        &module,
+        &import_object,
+        method_name,
+        #[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
+        gas_mode,
+        #[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
+        &mut logic,
+    )
+    .err();
     (Some(logic.outcome()), err)
 }
 
+#[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
 pub enum GasMode {
     // u64 number of available normal ops in wasm, not the prepaid gas
     Paid(u64),
@@ -319,8 +333,8 @@ fn run_method(
     module: &Module,
     import: &ImportObject,
     method_name: &str,
-    gas_mode: GasMode,
-    logic: &mut VMLogic,
+    #[cfg(feature = "protocol_feature_wasm_global_gas_counter")] gas_mode: GasMode,
+    #[cfg(feature = "protocol_feature_wasm_global_gas_counter")] logic: &mut VMLogic,
 ) -> Result<(), VMError> {
     let _span = tracing::debug_span!(target: "vm", "run_method").entered();
 
@@ -330,32 +344,45 @@ fn run_method(
         module.instantiate_without_start_func(import).map_err(|err| err.into_vm_error())?
     };
 
-    let instance = Wasmer0Instance(instance);
-    if let GasMode::Paid(available_ops) = gas_mode {
-        instance.set_remaining_ops(available_ops);
-    }
-
-    logic.set_instance(Some(&instance as *const dyn InstanceLike));
-    let result = run_method_inner(&instance.0, method_name, gas_mode, logic);
-    logic.set_instance(None);
+    #[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
     {
-        let _span = tracing::debug_span!(target: "vm", "run_method/drop_instance").entered();
-        drop(instance)
+        let instance = Wasmer0Instance(instance);
+        if let GasMode::Paid(available_ops) = gas_mode {
+            instance.set_remaining_ops(available_ops);
+        }
+
+        logic.set_instance(Some(&instance as *const dyn InstanceLike));
+        let result = run_method_inner(&instance.0, method_name, gas_mode, logic);
+        logic.set_instance(None);
+        {
+            let _span = tracing::debug_span!(target: "vm", "run_method/drop_instance").entered();
+            drop(instance)
+        }
+        result
     }
 
-    result
+    #[cfg(not(feature = "protocol_feature_wasm_global_gas_counter"))]
+    {
+        let result = run_method_inner(&instance, method_name);
+        {
+            let _span = tracing::debug_span!(target: "vm", "run_method/drop_instance").entered();
+            drop(instance)
+        }
+        result
+    }
 }
 
 fn run_method_inner(
     instance: &wasmer_runtime_core::Instance,
     method_name: &str,
-    gas_mode: GasMode,
-    logic: &mut VMLogic,
+    #[cfg(feature = "protocol_feature_wasm_global_gas_counter")] gas_mode: GasMode,
+    #[cfg(feature = "protocol_feature_wasm_global_gas_counter")] logic: &mut VMLogic,
 ) -> Result<(), VMError> {
     let call_start_func_result = {
         let _span = tracing::debug_span!(target: "vm", "run_method/call_start_func").entered();
         instance.call_start_func()
     };
+    #[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
     if let GasMode::Paid(_) = gas_mode {
         logic.sync_from_wasm_counter().map_err(|e: VMLogicError| -> VMError { (&e).into() })?;
     }
@@ -366,6 +393,7 @@ fn run_method_inner(
         instance.call(&method_name, &[])
     };
 
+    #[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
     if let GasMode::Paid(_) = gas_mode {
         logic.sync_from_wasm_counter().map_err(|e: VMLogicError| -> VMError { (&e).into() })?;
     }
@@ -397,6 +425,7 @@ pub(crate) fn run_wasmer0_module<'a>(
     // Note that we don't clone the actual backing memory, just increase the RC.
     let memory_copy = memory.clone();
 
+    #[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
     let gas_mode = if wasm_config.regular_op_cost > 0 {
         GasMode::Paid(context.prepaid_gas / wasm_config.regular_op_cost as u64)
     } else {
@@ -419,7 +448,16 @@ pub(crate) fn run_wasmer0_module<'a>(
         return (None, Some(e));
     }
 
-    let err = run_method(&module, &import_object, method_name, gas_mode, &mut logic).err();
+    let err = run_method(
+        &module,
+        &import_object,
+        method_name,
+        #[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
+        gas_mode,
+        #[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
+        &mut logic,
+    )
+    .err();
     (Some(logic.outcome()), err)
 }
 

@@ -62,4 +62,9 @@ protocol_feature_alt_bn128 = [
     "testlib/protocol_feature_alt_bn128",
     "nearcore/protocol_feature_alt_bn128",
 ]
+protocol_feature_wasm_global_gas_counter = [
+    "near-primitives/protocol_feature_wasm_global_gas_counter",
+    "near-vm-runner/protocol_feature_wasm_global_gas_counter",
+    "nearcore/protocol_feature_wasm_global_gas_counter",
+]
 sandbox = ["node-runtime/sandbox", "state-viewer/sandbox"]

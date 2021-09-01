@@ -1,5 +1,7 @@
 use crate::context::VMContext;
-use crate::dependencies::{External, InstanceLike, MemoryLike};
+#[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
+use crate::dependencies::InstanceLike;
+use crate::dependencies::{External, MemoryLike};
 use crate::gas_counter::GasCounter;
 use crate::types::{PromiseIndex, PromiseResult, ReceiptIndex, ReturnData};
 use crate::utils::split_method_names;
@@ -40,6 +42,7 @@ pub struct VMLogic<'a> {
     /// Pointer to the guest memory.
     memory: &'a mut dyn MemoryLike,
     /// Pointer to the instance (module layout + instance inner), for access wasm gas from host
+    #[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
     instance: Option<*const dyn InstanceLike>,
 
     /// Keeping track of the current account balance, which can decrease when we create promises
@@ -133,6 +136,7 @@ impl<'a> VMLogic<'a> {
             fees_config,
             promise_results,
             memory,
+            #[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
             instance: None,
             current_account_balance,
             current_account_locked_balance,
@@ -148,10 +152,12 @@ impl<'a> VMLogic<'a> {
         }
     }
 
+    #[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
     pub fn set_instance(&mut self, instance: Option<*const dyn InstanceLike>) {
         self.instance = instance;
     }
 
+    #[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
     pub fn sync_from_wasm_counter(&mut self) -> Result<()> {
         if self.config.regular_op_cost == 0 {
             return Ok(());
@@ -163,6 +169,7 @@ impl<'a> VMLogic<'a> {
         self.pay_gas_for_wasm_ops(remaining_ops_before - remaining_ops_after)
     }
 
+    #[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
     pub fn sync_to_wasm_counter(&self) {
         if self.config.regular_op_cost == 0 {
             return;
@@ -172,6 +179,7 @@ impl<'a> VMLogic<'a> {
         instance.set_remaining_ops(remaining_gas_now / self.config.regular_op_cost as u64);
     }
 
+    #[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
     pub fn remaining_prepaid_gas(&self) -> Gas {
         self.gas_counter.remaining_prepaid_gas()
     }
@@ -1090,6 +1098,7 @@ impl<'a> VMLogic<'a> {
     }
 
     /// Convert number of wasm ops to gas, and pay in gas counter
+    #[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
     pub fn pay_gas_for_wasm_ops(&mut self, ops: u64) -> Result<()> {
         let value = ops * Gas::from(self.config.regular_op_cost);
         self.gas_counter.pay_wasm_gas(value)
@@ -1100,6 +1109,7 @@ impl<'a> VMLogic<'a> {
     /// # Errors
     ///
     /// * Returns `GasExceeded` or `GasLimitExceeded`;
+    #[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
     pub fn out_of_gas_callback(&mut self, last_ops: u64) -> Result<()> {
         let value = last_ops * Gas::from(self.config.regular_op_cost);
         self.gas_counter.pay_wasm_gas(value)
