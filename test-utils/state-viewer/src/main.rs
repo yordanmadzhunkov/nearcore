@@ -15,6 +15,7 @@ use near_chain::chain::collect_receipts_from_response;
 use near_chain::migrations::check_if_block_is_first_with_chunk_of_version;
 use near_chain::types::{ApplyTransactionResult, BlockHeaderInfo};
 use near_chain::{ChainStore, ChainStoreAccess, ChainStoreUpdate, RuntimeAdapter};
+use near_chain_configs::Genesis;
 use near_logger_utils::init_integration_logger;
 use near_network::peer_store::PeerStore;
 use near_primitives::block::BlockHeader;
@@ -31,6 +32,7 @@ use near_store::{create_store, Store, TrieIterator};
 use nearcore::{get_default_home, get_store_path, load_config, NearConfig, NightshadeRuntime};
 use node_runtime::adapter::ViewRuntimeAdapter;
 use state_dump::state_dump;
+use tracing::field::debug;
 
 mod state_dump;
 
@@ -844,6 +846,15 @@ fn main() {
                 )
                 .help("dump contract data in storage of given account to binary file"),
         )
+        .subcommand(
+            SubCommand::with_name("load_genesis").arg(
+                Arg::with_name("path")
+                    .long("path")
+                    .help("path")
+                    .takes_value(true)
+                    .default_value("output.json"),
+            ),
+        )
         .get_matches();
 
     let home_dir = matches.value_of("home").map(|dir| Path::new(dir)).unwrap();
@@ -852,6 +863,12 @@ fn main() {
     let store = create_store(&get_store_path(&home_dir));
 
     match matches.subcommand() {
+        ("load_genesis", Some(args)) => {
+            let path = args.value_of("path").unwrap();
+            let genesis = Genesis::from_file(path);
+            println!("Genesis read");
+            println!("{} records found", genesis.records.0.len());
+        }
         ("peers", Some(_args)) => {
             let peer_store = PeerStore::new(store, &[]).unwrap();
             for (peer_id, peer_info) in peer_store.iter() {

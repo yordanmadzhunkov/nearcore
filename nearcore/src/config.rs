@@ -827,6 +827,13 @@ pub fn betanet_runtime_config() -> RuntimeConfig {
     serde_json::from_slice(*BETANET_CONFIG_JSON).expect("Failed to deserialize BetaNet config")
 }
 
+pub fn testnet_runtime_config() -> RuntimeConfig {
+    lazy_static_include::lazy_static_include_bytes! {
+        TESTNET_CONFIG_JSON => "res/testnet_runtime_config.json",
+    };
+    serde_json::from_slice(*TESTNET_CONFIG_JSON).expect("Failed to deserialize TestNet config")
+}
+
 /// Initializes genesis and client configs and stores in the given folder
 pub fn init_configs(
     dir: &Path,
