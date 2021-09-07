@@ -84,7 +84,6 @@ fn main() -> anyhow::Result<()> {
         // Build test contract for later usage in metrics computation.
 
         let mut buf = String::new();
-        let project_root = project_root();
         buf.push_str("set -ex;\n");
         buf.push_str("cd /home;\n");
         // buf.push_str(&format!(
@@ -95,11 +94,15 @@ fn main() -> anyhow::Result<()> {
 
         buf
     };
-    let output = std::process::Command::new(&build_test_contract)
+    let project_root = project_root();
+    let estimator_dir = project_root.join("runtime/runtime-params-estimator");
+    let build_test_contract = "pushd ./test-contract && ./build.sh && popd";
+    let output = std::process::Command::new(build_test_contract)
+        .current_dir(estimator_dir)
         .output()
-        .with_context(|| format!("failed to run `{}`", &build_test_contract))?;
+        .with_context(|| format!("failed to run `{}`", build_test_contract))?;
     if !output.status.success() {
-        anyhow::bail!("failed to run `{}`", &build_test_contract);
+        anyhow::bail!("failed to run `{}`", build_test_contract);
     }
     // exec(&build_test_contract).context("could not build test contract")?;
 
