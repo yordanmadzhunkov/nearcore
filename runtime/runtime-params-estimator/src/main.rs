@@ -97,13 +97,16 @@ fn main() -> anyhow::Result<()> {
     let project_root = project_root();
     let estimator_dir = project_root.join("runtime/runtime-params-estimator");
     let build_test_contract = "pushd ./test-contract && ./build.sh && popd";
-    let output = std::process::Command::new(build_test_contract)
-        .current_dir(estimator_dir)
+    let output = std::process::Command::new("echo 123")
+        .current_dir("/home")
         .output()
         .with_context(|| format!("failed to run `{}`", build_test_contract))?;
     if !output.status.success() {
         anyhow::bail!("failed to run `{}`", build_test_contract);
     }
+    let stdout = String::from_utf8(output.stdout)
+        .with_context(|| format!("failed to run `{}`", build_test_contract))?;
+    println!("{}", stdout.trim().to_string());
     // exec(&build_test_contract).context("could not build test contract")?;
 
     if cli_args.docker {
