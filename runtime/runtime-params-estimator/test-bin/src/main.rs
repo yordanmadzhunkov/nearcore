@@ -1,8 +1,21 @@
 use anyhow::Context;
+use std::path::PathBuf;
+
+fn project_root() -> PathBuf {
+    let dir = env!("CARGO_MANIFEST_DIR");
+    let res = PathBuf::from(dir).ancestors().nth(2).unwrap().to_owned();
+    assert!(res.join(".github").exists());
+    res
+}
 
 fn main() -> anyhow::Result<()> {
-    let build_test_contract = "echo";
-    let output = std::process::Command::new(build_test_contract).args(&["123"]).output().unwrap();
+    let build_test_contract = "pwd";
+    let project_root = project_root();
+    let estimator_dir = project_root.join("runtime/runtime-params-estimator/test-contract");
+    let output = std::process::Command::new(build_test_contract)
+        .current_dir(estimator_dir)
+        .output()
+        .unwrap();
     let out = String::from_utf8(output.stdout.clone())?;
     let err = String::from_utf8(output.stderr.clone())?;
     println!("{}", &out);
