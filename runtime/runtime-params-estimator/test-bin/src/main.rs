@@ -2,7 +2,7 @@ use anyhow::Context;
 
 fn main() -> anyhow::Result<()> {
     let build_test_contract = "echo";
-    let output = std::process::Command::new(build_test_contract).args(["123"]).output().unwrap();
+    let output = std::process::Command::new(build_test_contract).args(&["123"]).output().unwrap();
     let out = String::from_utf8(output.stdout.clone())?;
     let err = String::from_utf8(output.stderr.clone())?;
     println!("{}", &out);
