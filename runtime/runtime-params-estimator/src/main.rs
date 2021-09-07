@@ -98,7 +98,6 @@ fn main() -> anyhow::Result<()> {
     let estimator_dir = project_root.join("runtime/runtime-params-estimator");
     let build_test_contract = "pushd ./test-contract && ./build.sh && popd";
     let output = std::process::Command::new("echo 123")
-        .current_dir("/home")
         .output()
         .with_context(|| format!("failed to run `{}`", build_test_contract))?;
     if !output.status.success() {
