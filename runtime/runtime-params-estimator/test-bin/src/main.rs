@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 fn project_root() -> PathBuf {
     let dir = env!("CARGO_MANIFEST_DIR");
-    let res = PathBuf::from(dir).ancestors().nth(4).unwrap().to_owned();
+    let res = PathBuf::from(dir).ancestors().nth(3).unwrap().to_owned();
     assert!(res.join(".github").exists());
     res
 }
