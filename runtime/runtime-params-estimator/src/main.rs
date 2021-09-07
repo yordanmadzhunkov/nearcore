@@ -93,11 +93,11 @@ fn main() -> anyhow::Result<()> {
 
         buf
     };
-    let output = std::process::Command::new(build_test_contract)
+    let output = std::process::Command::new(&build_test_contract)
         .output()
-        .with_context(|| format!("failed to run `{}`", build_test_contract))?;
+        .with_context(|| format!("failed to run `{}`", &build_test_contract))?;
     if !output.status.success() {
-        anyhow::bail!("failed to run `{}`", build_test_contract);
+        anyhow::bail!("failed to run `{}`", &build_test_contract);
     }
     // exec(&build_test_contract).context("could not build test contract")?;
 
