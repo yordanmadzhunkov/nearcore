@@ -85,6 +85,7 @@ fn main() -> anyhow::Result<()> {
 
         let mut buf = String::new();
         let project_root = project_root();
+        buf.push_str("set -ex;\n");
         buf.push_str(&format!(
             "cd {};\n",
             project_root.join("runtime/runtime-params-estimator").to_str().unwrap()
