@@ -1,0 +1,11 @@
+[package]
+name = "test-bin"
+version = "3.0.0"
+authors = ["Near Inc <hello@nearprotocol.com>"]
+edition = "2018"
+
+[[bin]]
+name = "test-bin"
+
+[dependencies]
+anyhow = "1"

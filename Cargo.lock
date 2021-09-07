@@ -5044,6 +5044,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "test-bin"
+version = "3.0.0"
+dependencies = [
+ "anyhow",
+]
+
+[[package]]
 name = "testlib"
 version = "0.1.0"
 dependencies = [

@@ -45,6 +45,7 @@ members = [
     "tools/storage-usage-delta-calculator",
     "tools/restored-receipts-verifier",
     "integration-tests",
+    "runtime/runtime-params-estimator/test-bin"
 ]
 
 [patch.crates-io]
