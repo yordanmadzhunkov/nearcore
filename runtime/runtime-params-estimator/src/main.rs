@@ -89,7 +89,7 @@ fn main() -> anyhow::Result<()> {
             "cd {};\n",
             project_root.join("runtime/runtime-params-estimator").to_str().unwrap()
         ));
-        buf.push_str("pushd ./test-contract && ./build.sh && popd;");
+        // buf.push_str("pushd ./test-contract && ./build.sh && popd;");
 
         buf
     };
