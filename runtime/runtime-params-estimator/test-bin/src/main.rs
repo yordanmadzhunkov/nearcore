@@ -9,7 +9,7 @@ fn project_root() -> PathBuf {
 }
 
 fn main() -> anyhow::Result<()> {
-    let build_test_contract = "./build.sh";
+    let build_test_contract = "set -ex && ./build.sh";
     let project_root = project_root();
     let estimator_dir = project_root.join("runtime/runtime-params-estimator/test-contract");
     let output = std::process::Command::new(build_test_contract)
