@@ -8,6 +8,7 @@ use crate::utils::split_method_names;
 use crate::ValuePtr;
 use byteorder::ByteOrder;
 use near_crypto::Secp256K1Signature;
+use near_primitives::checked_feature;
 use near_primitives::version::is_implicit_account_creation_enabled;
 use near_primitives_core::config::ExtCosts::*;
 use near_primitives_core::config::{ActionCosts, ExtCosts, VMConfig, ViewConfig};
@@ -162,6 +163,13 @@ impl<'a> VMLogic<'a> {
         if self.config.regular_op_cost == 0 {
             return Ok(());
         }
+        if !checked_feature!(
+            "protocol_feature_wasm_global_gas_counter",
+            WasmGlobalGasCounter,
+            self.current_protocol_version
+        ) {
+            return Ok(());
+        }
         let remaining_gas_before = self.gas_counter.remaining_prepaid_gas();
         let remaining_ops_before = remaining_gas_before / self.config.regular_op_cost as u64;
         let instance = unsafe { self.instance.unwrap().as_ref() }.unwrap();
@@ -172,6 +180,13 @@ impl<'a> VMLogic<'a> {
     #[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
     pub fn sync_to_wasm_counter(&self) {
         if self.config.regular_op_cost == 0 {
+            return;
+        }
+        if !checked_feature!(
+            "protocol_feature_wasm_global_gas_counter",
+            WasmGlobalGasCounter,
+            self.current_protocol_version
+        ) {
             return;
         }
         let remaining_gas_now = self.gas_counter.remaining_prepaid_gas();

@@ -5,6 +5,8 @@ use parity_wasm::builder;
 use parity_wasm::elements::{self, External, MemorySection, Type};
 use pwasm_utils::{self, rules};
 
+use near_primitives::checked_feature;
+use near_primitives::types::ProtocolVersion;
 use near_vm_errors::PrepareError;
 use near_vm_logic::VMConfig;
 
@@ -56,19 +58,25 @@ impl<'a> ContractModule<'a> {
         }
     }
 
-    fn inject_gas_metering(self) -> Result<Self, PrepareError> {
+    fn inject_gas_metering(self, protocol_version: ProtocolVersion) -> Result<Self, PrepareError> {
         let Self { module, config } = self;
         // Free config, no need for gas metering.
         if config.regular_op_cost == 0 {
             return Ok(Self { module, config });
         }
         let gas_rules = rules::Set::new(1, Default::default()).with_grow_cost(config.grow_mem_cost);
-        #[cfg(feature = "protocol_feature_wasm_global_gas_counter")]
-        let module = pwasm_utils::inject_global_gas_counter(module, &gas_rules)
-            .map_err(|_| PrepareError::GasInstrumentation)?;
-        #[cfg(not(feature = "protocol_feature_wasm_global_gas_counter"))]
-        let module = pwasm_utils::inject_gas_counter(module, &gas_rules)
-            .map_err(|_| PrepareError::GasInstrumentation)?;
+
+        let module = if checked_feature!(
+            "protocol_feature_wasm_global_gas_counter",
+            WasmGlobalGasCounter,
+            protocol_version
+        ) {
+            pwasm_utils::inject_global_gas_counter(module, &gas_rules)
+                .map_err(|_| PrepareError::GasInstrumentation)?
+        } else {
+            pwasm_utils::inject_gas_counter(module, &gas_rules)
+                .map_err(|_| PrepareError::GasInstrumentation)?
+        };
         Ok(Self { module, config })
     }
 
@@ -156,11 +164,15 @@ impl<'a> ContractModule<'a> {
 /// - all imported functions from the external environment matches defined by `env` module,
 ///
 /// The preprocessing includes injecting code for gas metering and metering the height of stack.
-pub fn prepare_contract(original_code: &[u8], config: &VMConfig) -> Result<Vec<u8>, PrepareError> {
+pub fn prepare_contract(
+    original_code: &[u8],
+    config: &VMConfig,
+    protocol_version: ProtocolVersion,
+) -> Result<Vec<u8>, PrepareError> {
     ContractModule::init(original_code, config)?
         .standardize_mem()
         .ensure_no_internal_memory()?
-        .inject_gas_metering()?
+        .inject_gas_metering(protocol_version)?
         .inject_stack_height_metering()?
         .scan_imports()?
         .into_wasm_code()
@@ -171,11 +183,12 @@ mod tests {
     use assert_matches::assert_matches;
 
     use super::*;
+    use near_primitives::version::PROTOCOL_VERSION;
 
     fn parse_and_prepare_wat(wat: &str) -> Result<Vec<u8>, PrepareError> {
         let wasm = wat::parse_str(wat).unwrap();
         let config = VMConfig::default();
-        prepare_contract(wasm.as_ref(), &config)
+        prepare_contract(wasm.as_ref(), &config, PROTOCOL_VERSION)
     }
 
     #[test]

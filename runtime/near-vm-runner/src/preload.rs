@@ -59,10 +59,16 @@ pub struct ContractCaller {
     vm_data_private: VMDataPrivate,
     vm_data_shared: VMDataShared,
     preloaded: Vec<CallInner>,
+    protocol_version: ProtocolVersion,
 }
 
 impl ContractCaller {
-    pub fn new(num_threads: usize, vm_kind: VMKind, vm_config: VMConfig) -> ContractCaller {
+    pub fn new(
+        num_threads: usize,
+        vm_kind: VMKind,
+        vm_config: VMConfig,
+        protocol_version: ProtocolVersion,
+    ) -> ContractCaller {
         let (shared, private) = match vm_kind {
             VMKind::Wasmer0 => (
                 VMDataShared::Wasmer0,
@@ -106,6 +112,7 @@ impl ContractCaller {
             vm_data_private: private,
             vm_data_shared: shared,
             preloaded: Vec::new(),
+            protocol_version: protocol_version,
         }
     }
 
@@ -123,7 +130,17 @@ impl ContractCaller {
                 let vm_config = self.vm_config.clone();
                 let vm_data_shared = self.vm_data_shared.clone();
                 let vm_kind = self.vm_kind.clone();
-                move || preload_in_thread(request, vm_kind, vm_config, vm_data_shared, tx)
+                let protocol_version = self.protocol_version.clone();
+                move || {
+                    preload_in_thread(
+                        request,
+                        vm_kind,
+                        vm_config,
+                        vm_data_shared,
+                        tx,
+                        protocol_version,
+                    )
+                }
             });
             result.push(ContractCallPrepareResult { handle: index });
         }
@@ -225,12 +242,18 @@ fn preload_in_thread(
     vm_config: VMConfig,
     vm_data_shared: VMDataShared,
     tx: Sender<VMCallData>,
+    protocol_version: ProtocolVersion,
 ) {
     let cache = request.cache.as_deref();
     let result = match (vm_kind, vm_data_shared) {
         (VMKind::Wasmer0, VMDataShared::Wasmer0) => {
-            cache::wasmer0_cache::compile_module_cached_wasmer0(&request.code, &vm_config, cache)
-                .map(VMModule::Wasmer0)
+            cache::wasmer0_cache::compile_module_cached_wasmer0(
+                &request.code,
+                &vm_config,
+                cache,
+                protocol_version,
+            )
+            .map(VMModule::Wasmer0)
         }
         (VMKind::Wasmer1, VMDataShared::Wasmer1(store)) => {
             cache::wasmer1_cache::compile_module_cached_wasmer1(
@@ -238,6 +261,7 @@ fn preload_in_thread(
                 &vm_config,
                 cache,
                 &store,
+                protocol_version,
             )
             .map(|m| VMModule::Wasmer1(m))
         }

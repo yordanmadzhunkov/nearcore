@@ -110,7 +110,8 @@ type CompileCost = (u64, Ratio<u64>);
 fn compile(code: &[u8], gas_metric: GasMetric, vm_kind: VMKind) -> Option<CompileCost> {
     let start = start_count(gas_metric);
     for _ in 0..NUM_ITERATIONS {
-        let prepared_code = prepare::prepare_contract(code, &VMConfig::default()).unwrap();
+        let prepared_code =
+            prepare::prepare_contract(code, &VMConfig::default(), PROTOCOL_VERSION).unwrap();
         if compile_module(vm_kind, &prepared_code) {
             return None;
         }
@@ -141,7 +142,7 @@ fn measure_contract(
 ) -> u64 {
     let vm_config = VMConfig::default();
     let start = start_count(gas_metric);
-    let result = precompile_contract_vm(vm_kind, &contract, &vm_config, cache);
+    let result = precompile_contract_vm(vm_kind, &contract, &vm_config, cache, PROTOCOL_VERSION);
     let end = end_count(gas_metric, &start);
     assert!(result.is_ok(), "Compilation failed");
     end
@@ -352,7 +353,7 @@ fn test_many_contracts_call(gas_metric: GasMetric, vm_kind: VMKind) {
     let cache: Option<&dyn CompiledContractCache> = Some(cache_store.as_ref());
     let vm_config = VMConfig::default();
     for contract in &contracts {
-        let result = precompile_contract_vm(vm_kind, contract, &vm_config, cache);
+        let result = precompile_contract_vm(vm_kind, contract, &vm_config, cache, PROTOCOL_VERSION);
         assert!(result.is_ok());
     }
     let mut fake_external = MockedExternal::new();

@@ -351,6 +351,7 @@ impl Runtime {
                     &account_id,
                     deploy_contract,
                     &apply_state,
+                    apply_state.current_protocol_version,
                 )?;
             }
             Action::FunctionCall(function_call) => {

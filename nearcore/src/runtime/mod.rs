@@ -588,6 +588,7 @@ impl NightshadeRuntime {
                         &code,
                         &runtime_config.wasm_config,
                         compiled_contract_cache.as_deref(),
+                        protocol_version,
                     )
                     .ok();
                 })

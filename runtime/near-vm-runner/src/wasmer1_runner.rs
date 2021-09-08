@@ -222,6 +222,7 @@ pub fn run_wasmer1(
         wasm_config,
         cache,
         &store,
+        current_protocol_version,
     ) {
         Ok(x) => x,
         Err(err) => return (None, Some(err)),

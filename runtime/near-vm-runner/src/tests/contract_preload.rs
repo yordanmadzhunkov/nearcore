@@ -6,6 +6,7 @@ use near_vm_logic::{ProtocolVersion, VMConfig, VMContext, VMOutcome};
 use crate::cache::precompile_contract_vm;
 use crate::errors::ContractPrecompilatonResult;
 use near_primitives::types::CompiledContractCache;
+use near_primitives::version::PROTOCOL_VERSION;
 use near_vm_errors::VMError::FunctionCallError;
 use near_vm_logic::mocks::mock_external::MockedExternal;
 use std::collections::HashMap;
@@ -109,7 +110,7 @@ fn test_vm_runner(preloaded: bool, vm_kind: VMKind, repeat: i32) {
 
     if preloaded {
         let mut requests = Vec::new();
-        let mut caller = ContractCaller::new(4, vm_kind, vm_config);
+        let mut caller = ContractCaller::new(4, vm_kind, vm_config, PROTOCOL_VERSION);
         for _ in 0..repeat {
             requests.push(ContractCallPrepareRequest {
                 code: Arc::clone(&code1),
@@ -197,19 +198,19 @@ fn test_precompile_vm(vm_kind: VMKind) {
     let code1 = ContractCode::new(near_test_contracts::rs_contract().to_vec(), None);
     let code2 = ContractCode::new(near_test_contracts::ts_contract().to_vec(), None);
 
-    let result = precompile_contract_vm(vm_kind, &code1, &vm_config, cache);
+    let result = precompile_contract_vm(vm_kind, &code1, &vm_config, cache, PROTOCOL_VERSION);
     assert_eq!(result, Result::Ok(ContractPrecompilatonResult::ContractCompiled));
     assert_eq!(mock_cache.len(), 1);
-    let result = precompile_contract_vm(vm_kind, &code1, &vm_config, cache);
+    let result = precompile_contract_vm(vm_kind, &code1, &vm_config, cache, PROTOCOL_VERSION);
     assert_eq!(result, Result::Ok(ContractPrecompilatonResult::ContractAlreadyInCache));
     assert_eq!(mock_cache.len(), 1);
-    let result = precompile_contract_vm(vm_kind, &code2, &vm_config, None);
+    let result = precompile_contract_vm(vm_kind, &code2, &vm_config, None, PROTOCOL_VERSION);
     assert_eq!(result, Result::Ok(ContractPrecompilatonResult::CacheNotAvailable));
     assert_eq!(mock_cache.len(), 1);
-    let result = precompile_contract_vm(vm_kind, &code2, &vm_config, cache);
+    let result = precompile_contract_vm(vm_kind, &code2, &vm_config, cache, PROTOCOL_VERSION);
     assert_eq!(result, Result::Ok(ContractPrecompilatonResult::ContractCompiled));
     assert_eq!(mock_cache.len(), 2);
-    let result = precompile_contract_vm(vm_kind, &code2, &vm_config, cache);
+    let result = precompile_contract_vm(vm_kind, &code2, &vm_config, cache, PROTOCOL_VERSION);
     assert_eq!(result, Result::Ok(ContractPrecompilatonResult::ContractAlreadyInCache));
     assert_eq!(mock_cache.len(), 2);
 }
